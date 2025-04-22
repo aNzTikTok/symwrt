@@ -20,17 +20,26 @@ jobs:
           tar --exclude='.git' --exclude='out' -czf Packages.gz *
           mv Packages.gz out/
 
+      - name: Generate GPG Key (if not already available)
+        run: |
+          # Assuming you have a GPG key already stored in GitHub Secrets
+          echo "${{ secrets.GPG_PRIVATE_KEY }}" | gpg --batch --import
+          # Sign the Packages.gz file
+          gpg --armor --detach-sign --output out/Packages.sig out/Packages.gz
+
       - name: Create Git Tag
         id: create_tag
         run: |
-          VERSION="v1.0.0"
+          # Generate a timestamp-based version tag
+          VERSION=$(date +v%Y%m%d-%H%M%S)
+          echo "Generated tag: $VERSION"
           git tag $VERSION
           git push origin $VERSION
 
-      - name: Upload Packages.gz to GitHub Release
+      - name: Upload Packages.gz and Packages.sig to GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          files: out/Packages.gz
-          tag_name: v1.0.0  # Tag used for the release
+          files: out/Packages.gz,out/Packages.sig  # Upload both files
+          tag_name: ${{ steps.create_tag.outputs.VERSION }}  # Use the generated version
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
