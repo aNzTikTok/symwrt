@@ -1,4 +1,5 @@
 
 config 3ginfo
-	option device ''
 	option website 'http://www.btsearch.pl/szukaj.php?mode=std&search='
+	option network 'wwan'
+	option device '/dev/ttyUSB3'
