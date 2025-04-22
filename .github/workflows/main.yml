@@ -17,6 +17,11 @@ jobs:
           mkdir -p out
           tar --exclude='.git' --exclude='out' -czf Packages.gz *
           mv Packages.gz out/
+          
+      - name: Download Packages.sig using curl
+        run: |
+          curl -O https://immortalwrt.kyarucloud.moe/releases/24.10-SNAPSHOT/packages/aarch64_cortex-a53/base/Packages.sig
+
 
       - name: Create Git Tag
         id: create_tag
