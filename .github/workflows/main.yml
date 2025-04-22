@@ -22,8 +22,10 @@ jobs:
 
       - name: Generate GPG Key (if not already available)
         run: |
-          # Assuming you have a GPG key already stored in GitHub Secrets
-          echo "${{ secrets.GPG_PRIVATE_KEY }}" | gpg --batch --import
+          # Import the GPG key stored in GitHub Secrets
+          echo "${{ secrets.GPG_PRIVATE_KEY }}" > private.key
+          gpg --batch --import private.key
+          rm private.key  # Clean up the private key file
           # Sign the Packages.gz file
           gpg --armor --detach-sign --output out/Packages.sig out/Packages.gz
 
