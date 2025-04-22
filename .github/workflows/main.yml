@@ -5,16 +5,20 @@ on:
     types: [published]
 
 jobs:
-  create-and-upload:
+  compress-and-upload:
     runs-on: ubuntu-latest
+
+    permissions:
+      contents: write  # Required to upload to releases
+
     steps:
-      - name: Checkout code
+      - name: Checkout repository
         uses: actions/checkout@v4
 
       - name: Create Packages.gz
         run: |
           mkdir -p out
-          tar -czvf out/Packages.gz . --exclude='./.git' --exclude='./out'
+          tar -czf out/Packages.gz . --exclude=.git --exclude=out
 
       - name: Upload Packages.gz to GitHub Release
         uses: softprops/action-gh-release@v2
