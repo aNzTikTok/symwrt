@@ -1,5 +1,3 @@
-name: Create and Upload Packages.gz (Manual)
-
 on:
   workflow_dispatch:  # Manual trigger
 
@@ -20,10 +18,6 @@ jobs:
           tar --exclude='.git' --exclude='out' -czf Packages.gz *
           mv Packages.gz out/
 
-      - name: Download Packages.sig using curl
-        run: |
-          curl -O https://immortalwrt.kyarucloud.moe/releases/24.10-SNAPSHOT/packages/aarch64_cortex-a53/base/Packages.sig
-
       - name: Create Git Tag
         id: create_tag
         run: |
@@ -32,11 +26,12 @@ jobs:
           echo "Generated tag: $VERSION"
           git tag $VERSION
           git push origin $VERSION
+          echo "::set-output name=version::$VERSION"  # Pass the tag as an output
 
       - name: Upload Packages.gz and Packages.sig to GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          files: out/Packages.gz,Packages.sig  # Upload both files
-          tag_name: ${{ steps.create_tag.outputs.VERSION }}  # Use the generated version
+          files: out/Packages.gz,out/Packages.sig  # Upload both files
+          tag_name: ${{ steps.create_tag.outputs.version }}  # Use the generated version
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
