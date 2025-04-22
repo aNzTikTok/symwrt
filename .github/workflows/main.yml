@@ -20,6 +20,26 @@ jobs:
           tar --exclude='.git' --exclude='out' -czf Packages.gz *
           mv Packages.gz out/
 
+      - name: Create Release with Tag (if not exists)
+        id: create_release
+        run: |
+          VERSION="v1.0.0"
+          # Check if release with tag exists
+          release_url=$(curl --silent --header "Authorization: token $GITHUB_TOKEN" \
+            "https://api.github.com/repos/${GITHUB_REPOSITORY}/releases/tags/$VERSION" | \
+            jq -r .url)
+          
+          # If release URL is null (release doesn't exist), create one
+          if [[ "$release_url" == "null" ]]; then
+            echo "Release does not exist, creating release..."
+            response=$(curl --silent --header "Authorization: token $GITHUB_TOKEN" \
+              --data "{\"tag_name\":\"$VERSION\",\"name\":\"Release $VERSION\",\"body\":\"Automatic release from GitHub Actions\"}" \
+              "https://api.github.com/repos/${GITHUB_REPOSITORY}/releases")
+            echo "Release created: $response"
+          else
+            echo "Release already exists with tag $VERSION."
+          fi
+
       - name: Upload Packages.gz to GitHub Release
         uses: softprops/action-gh-release@v2
         with:
