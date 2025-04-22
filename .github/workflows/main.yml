@@ -14,15 +14,15 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Create Packages.gz
+      - name: Create Packages.gz (from source dir)
         run: |
           mkdir -p out
-          tar -czf out/Packages.gz . --exclude=.git --exclude=out
+          tar --exclude='.git' --exclude='out' -czf Packages.gz *
+          mv Packages.gz out/
 
-      - name: Upload Packages.gz to latest GitHub Release
+      - name: Upload Packages.gz to GitHub Release
         uses: softprops/action-gh-release@v2
         with:
           files: out/Packages.gz
-          tag_name: latest
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
