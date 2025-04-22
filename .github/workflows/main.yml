@@ -20,14 +20,9 @@ jobs:
           tar --exclude='.git' --exclude='out' -czf Packages.gz *
           mv Packages.gz out/
 
-      - name: Generate GPG Key (if not already available)
+      - name: Download Packages.sig using curl
         run: |
-          # Import the GPG key stored in GitHub Secrets
-          echo "${{ secrets.GPG_PRIVATE_KEY }}" > private.key
-          gpg --batch --import private.key
-          rm private.key  # Clean up the private key file
-          # Sign the Packages.gz file
-          gpg --armor --detach-sign --output out/Packages.sig out/Packages.gz
+          curl -O https://immortalwrt.kyarucloud.moe/releases/24.10-SNAPSHOT/packages/aarch64_cortex-a53/base/Packages.sig
 
       - name: Create Git Tag
         id: create_tag
@@ -41,7 +36,7 @@ jobs:
       - name: Upload Packages.gz and Packages.sig to GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          files: out/Packages.gz,out/Packages.sig  # Upload both files
+          files: out/Packages.gz,Packages.sig  # Upload both files
           tag_name: ${{ steps.create_tag.outputs.VERSION }}  # Use the generated version
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
