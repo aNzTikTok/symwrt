@@ -1,7 +1,7 @@
 name: Create and Upload Packages.gz (Manual)
 
 on:
-  workflow_dispatch:
+  workflow_dispatch:  # Manual trigger
 
 jobs:
   compress-and-upload:
