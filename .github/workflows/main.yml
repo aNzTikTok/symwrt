@@ -21,7 +21,7 @@ jobs:
       - name: Download Packages.sig using curl
         run: |
           curl -O https://immortalwrt.kyarucloud.moe/releases/24.10-SNAPSHOT/packages/aarch64_cortex-a53/base/Packages.sig
-
+          mv Packages.sig out/  # Move Packages.sig to the 'out' directory
 
       - name: Create Git Tag
         id: create_tag
